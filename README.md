@@ -18,7 +18,7 @@ Controle financeiro pessoal: categorias, receitas, despesas e saldo.
 O núcleo (domínio + casos de uso) não conhece Spring, JPA nem HTTP. Ele define **portas** (interfaces) e o mundo externo se conecta por **adapters**.
 
 ```mermaid
-flowchart LR
+flowchart TB
     A[Angular] -->|HTTP| B[Controllers<br/>adapter/in/web]
     B --> C[[Portas de entrada<br/>CategoriaUseCase<br/>TransacaoUseCase]]
     C --> D[Services + Domínio<br/>regras de negócio]
