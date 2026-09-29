@@ -1,0 +1,45 @@
+<section class="page">
+  <header class="page-head">
+    <h1>Categorias</h1>
+    <p>Organize de onde o dinheiro vem e para onde ele vai.</p>
+  </header>
+
+  <form class="panel form-row" [formGroup]="form" (ngSubmit)="salvar()">
+    <label class="field grow">
+      <span>Nome</span>
+      <input formControlName="nome" placeholder="Ex: Mercado, Salário, Transporte" />
+      @if (form.controls.nome.touched && form.controls.nome.invalid) {
+        <small class="field-error">Dê um nome de até 50 caracteres.</small>
+      }
+    </label>
+
+    <fieldset class="toggle">
+      <legend>Tipo</legend>
+      <label [class.on]="form.controls.tipo.value === 'DESPESA'">
+        <input type="radio" formControlName="tipo" value="DESPESA" /> Despesa
+      </label>
+      <label [class.on]="form.controls.tipo.value === 'RECEITA'">
+        <input type="radio" formControlName="tipo" value="RECEITA" /> Receita
+      </label>
+    </fieldset>
+
+    <button type="submit" class="btn" [disabled]="salvando()">Criar categoria</button>
+  </form>
+
+  @if (erro()) {
+    <p class="alert" role="alert">{{ erro() }}</p>
+  }
+
+  @if (categorias().length) {
+    <ul class="chips">
+      @for (c of categorias(); track c.id) {
+        <li class="chip" [class.receita]="c.tipo === 'RECEITA'">
+          {{ c.nome }}
+          <span>{{ c.tipo === 'RECEITA' ? 'receita' : 'despesa' }}</span>
+        </li>
+      }
+    </ul>
+  } @else if (!erro()) {
+    <p class="empty">Nenhuma categoria ainda. Crie a primeira acima, tipo "Mercado" ou "Salário".</p>
+  }
+</section>

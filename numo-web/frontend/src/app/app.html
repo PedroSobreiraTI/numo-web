@@ -1,0 +1,10 @@
+<header class="topbar">
+  <a routerLink="/" class="logo">numo</a>
+  <nav>
+    <a routerLink="/" routerLinkActive="ativo" [routerLinkActiveOptions]="{ exact: true }">Extrato</a>
+    <a routerLink="/categorias" routerLinkActive="ativo">Categorias</a>
+  </nav>
+</header>
+<main>
+  <router-outlet />
+</main>

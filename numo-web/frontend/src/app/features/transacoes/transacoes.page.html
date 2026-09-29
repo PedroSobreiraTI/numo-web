@@ -1,0 +1,97 @@
+<section class="page">
+  <header class="saldo" [class.negativo]="resumo().saldo < 0">
+    <p class="saldo-label">Saldo</p>
+    <p class="saldo-valor">{{ resumo().saldo | currency: 'BRL' }}</p>
+    <dl class="saldo-partes">
+      <div>
+        <dt>Entrou</dt>
+        <dd class="receita">{{ resumo().totalReceitas | currency: 'BRL' }}</dd>
+      </div>
+      <div>
+        <dt>Saiu</dt>
+        <dd class="despesa">{{ resumo().totalDespesas | currency: 'BRL' }}</dd>
+      </div>
+    </dl>
+  </header>
+
+  <form class="panel form-grid" [formGroup]="form" (ngSubmit)="salvar()">
+    <fieldset class="toggle span-all">
+      <legend>Tipo</legend>
+      <label [class.on]="form.controls.tipo.value === 'DESPESA'">
+        <input type="radio" formControlName="tipo" value="DESPESA" /> Despesa
+      </label>
+      <label [class.on]="form.controls.tipo.value === 'RECEITA'">
+        <input type="radio" formControlName="tipo" value="RECEITA" /> Receita
+      </label>
+    </fieldset>
+
+    <label class="field span-2">
+      <span>Descrição</span>
+      <input formControlName="descricao" placeholder="Ex: Feira da semana" />
+      @if (form.controls.descricao.touched && form.controls.descricao.invalid) {
+        <small class="field-error">Descreva a transação.</small>
+      }
+    </label>
+
+    <label class="field">
+      <span>Valor (R$)</span>
+      <input type="number" step="0.01" min="0.01" inputmode="decimal" formControlName="valor" placeholder="0,00" />
+      @if (form.controls.valor.touched && form.controls.valor.invalid) {
+        <small class="field-error">Informe um valor maior que zero.</small>
+      }
+    </label>
+
+    <label class="field">
+      <span>Data</span>
+      <input type="date" formControlName="data" />
+    </label>
+
+    <label class="field span-2">
+      <span>Categoria</span>
+      <select formControlName="categoriaId">
+        <option value="" disabled>Escolha uma categoria</option>
+        @for (c of categoriasDoTipo(); track c.id) {
+          <option [value]="c.id">{{ c.nome }}</option>
+        }
+      </select>
+      @if (!categoriasDoTipo().length && carregado()) {
+        <small class="hint">
+          Nenhuma categoria de {{ form.controls.tipo.value === 'RECEITA' ? 'receita' : 'despesa' }}.
+          <a routerLink="/categorias">Criar categoria</a>
+        </small>
+      } @else if (form.controls.categoriaId.touched && form.controls.categoriaId.invalid) {
+        <small class="field-error">Escolha uma categoria.</small>
+      }
+    </label>
+
+    <button type="submit" class="btn span-all" [disabled]="salvando()">
+      Registrar {{ form.controls.tipo.value === 'RECEITA' ? 'receita' : 'despesa' }}
+    </button>
+  </form>
+
+  @if (erro()) {
+    <p class="alert" role="alert">{{ erro() }}</p>
+  }
+
+  @if (transacoes().length) {
+    <ol class="extrato">
+      @for (t of transacoes(); track t.id) {
+        <li>
+          <time [attr.datetime]="t.data">{{ t.data | date: 'dd/MM' }}</time>
+          <div class="desc">
+            <strong>{{ t.descricao }}</strong>
+            <span>{{ nomeCategoria(t.categoriaId) }}</span>
+          </div>
+          <span class="valor" [class.receita]="t.tipo === 'RECEITA'" [class.despesa]="t.tipo === 'DESPESA'">
+            {{ t.tipo === 'RECEITA' ? '+' : '−' }} {{ t.valor | currency: 'BRL' }}
+          </span>
+          <button type="button" class="remover" (click)="remover(t)" [attr.aria-label]="'Remover ' + t.descricao">
+            Remover
+          </button>
+        </li>
+      }
+    </ol>
+  } @else if (carregado() && !erro()) {
+    <p class="empty">Nenhuma transação ainda. Registre a primeira no formulário acima.</p>
+  }
+</section>
